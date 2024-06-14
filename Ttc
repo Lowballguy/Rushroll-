@@ -1,0 +1,58 @@
+def play_game(self, email):
+    print("Welcome to the Guess the Die Roll Game!")
+    print("I'll roll a six-sided die, and you have to guess the number.")
+    
+    while True:
+        self.check_balance()
+        bet = input("Enter your bet amount: $")
+        
+        try:
+            bet = float(bet)
+        except ValueError:
+            print("Please enter a valid bet amount.")
+            continue
+        
+        if bet <= 0:
+            print("Please enter a bet amount greater than zero.")
+            continue
+        
+        if email not in self.players:
+            print("Email not registered. Please register first.")
+            return
+        
+        if bet > self.players[email]['wallet']:
+            print("Insufficient funds in your wallet.")
+            continue
+        
+        guess = input("Enter your guess (1-6): ")
+        
+        try:
+            guess = int(guess)
+        except ValueError:
+            print("Please enter a valid number.")
+            continue
+        
+        if guess < 1 or guess > 6:
+            print("Please enter a number between 1 and 6.")
+            continue
+        
+        self.wallet_balance -= bet
+        self.players[email]['wallet'] -= bet
+        
+        rolled_number = self.roll_die()
+        print(f"The die rolled: {rolled_number}")
+        
+        if guess == rolled_number:
+            winnings = bet * 5  # You win 5 times your bet amount
+            profit = winnings * 0.1  # Assume 10% profit for the game operator
+            player_winnings = winnings - profit  # Player's actual winnings
+            self.wallet_balance += profit  # Add profit to the game operator's wallet
+            self.players[email]['wallet'] += player_winnings  # Add actual winnings to player's wallet
+            print(f"Congratulations! You guessed the correct number and won ${player_winnings}!")
+        else:
+            print("Sorry, better luck next time!")
+
+        play_again = input("Do you want to play again? (yes/no): ").lower()
+        if play_again != "yes":
+            print("Thanks for playing!")
+            break
